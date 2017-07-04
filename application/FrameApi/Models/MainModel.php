@@ -11,7 +11,12 @@ namespace FrameApi\Models;
 
 
 use FrameApi\DB\Connection;
+use FrameApi\Exceptions\DBGetException;
 use FrameApi\Exceptions\DBInsertException;
+use FrameApi\Exceptions\DBUpdateException;
+use FrameApi\Exceptions\UndefinedMethodException;
+use FrameApi\Security\Hash;
+use FrameApi\Security\Token;
 use PDO;
 
 /**
@@ -24,7 +29,7 @@ class MainModel
      * Atributos del modelo permitidos.
      * @var array
      */
-    protected static $atributosPermitidos = [];
+    protected static $atributes = [];
 
     /**
      * Nombre de la base del modelo.
@@ -39,6 +44,8 @@ class MainModel
     protected static $primaryKey = "id";
 
 
+    protected static $fk;
+
     /**
      * Modelo constructor.
      * @param int|null $pk
@@ -51,23 +58,113 @@ class MainModel
     }
 
     /**
+     * Retorna los métodos get de cada propiedad del modelo.
+     * Esta función se ejecuta automágicamente  en el MainModel->cargarDatos;
+     * @param string $attrName  El nombre de la propiedad.
+     * @return mixed    El valor correspondiente a esa propiedad.
+     */
+    public function __get($attrName)
+    {
+        // Armamos el método: Ej: getTitle
+        $getterName = "get" . ucfirst($attrName);
+
+        // Verificamos si el método existe.
+        if(method_exists($this, $getterName)) {
+
+            return $this->{$getterName}();
+        } else {
+
+            return null;
+        }
+
+    }
+
+
+    /**
+     * Se ejecuta automágicamente cuando se trata de asignar un valor
+     * a un propiedad que no es pública, o no existe.
+     * @param $attrName
+     * @param $value
+     * @throws UndefinedMethodException
+     */
+    public function __set($attrName, $value)
+    {
+
+        // $this->{$attrName} = $value;
+
+        $methodName = 'set' . ucfirst($attrName);
+        if(method_exists($this, $methodName)) {
+            $this->{$methodName}($value);
+        } else {
+            throw new UndefinedMethodException('No existe un setter para ' . $attrName . ".");
+        }
+    }
+
+
+    /**
      * Carga los datos del array $data en la instancia.
      * @param array $data
      */
     public function cargarDatos($data)
     {
+
         foreach ($data as $key => $value) {
-            if(in_array($key, static::$atributosPermitidos)) {
-                // Ej: $key = "nombre";
-                //     $this->$key equivale a: $this->nombre
+
+            if(in_array($key, static::$atributes)) {
+
                 $this->{$key} = $value;
             }
+
+
+            // Obtenemos el nombre de la clase.
+            $className = get_class($this);
+
+            // Si la clase tiene un método para traer su FK y su FK es igual que la propierdad de la clase
+            if( method_exists($className, 'getFk') ){
+
+                for ($i = 0; $i < count($className::getFK()); $i++) {
+
+                    if( $key == $className::getFk()[$i] ) {
+
+                        // Rompemos el string del método y nos quedamos con el nombre de la entidad que hace referencia el FK.
+                        $property = explode('_', $className::getFk()[$i] );
+
+                        $idGetter = "getId". ucfirst($property[1]);
+
+                        // Cargamos la relación.
+                        $this->loadRelations($this->{$idGetter}(), $property[1]);
+
+                    }
+                }
+
+            }
+
         }
+
+
     }
+
+    /**
+     * Carga las relaciones del modelo.
+     * Es importante saber que esto solo funciona si las Fk de las tablas llevan la siguiente nomenclatura: id_tabla
+     * Por ejemplo: posts.id_user hace referencia a users.id
+     *
+     * @param $getFkValue int Valor del FK
+     * @param $property string Nombre de la propiedad que guarda la entidad que hace referencia a la FK.
+     */
+    public function loadRelations($getFkValue, $property)
+    {
+        $className = "\\FrameApi\\Models\\" . ucfirst($property);
+        $this->{$property} = new $className($getFkValue);
+
+    }
+
+
 
     /**
      * Busca según el id
      * @param int $pk
+     * @throws DBGetException
      */
     public function getByPk($pk)
     {
@@ -76,9 +173,19 @@ class MainModel
                   FROM " . static::$table . "
                   WHERE " . static::$primaryKey . " = ?";
         $stmt = Connection::getStatement($query);
-
         $stmt->execute([$this->getPrimaryKey()]);
-        $this->cargarDatos($stmt->fetch(PDO::FETCH_ASSOC));
+
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($data) {
+
+            $this->cargarDatos($data);
+
+        } else {
+
+            throw new DBGetException("No se encontró ningún registro.");
+        }
+
     }
 
     /**
@@ -87,45 +194,76 @@ class MainModel
      */
     public static function getAll()
     {
+
         $query = "SELECT * FROM " . static::$table;
+
         $stmt = Connection::getStatement($query);
+
         $stmt->execute();
         $salida = [];
         while($fila = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+            // Creamos un modelo.
             $model = new static();
+            // Le insertamos el id
             $model->setPrimaryKey($fila[static::$primaryKey]);
+            // Le cargamos los datos.
             $model->cargarDatos($fila);
+            // Lo sumamos al array de salida.
             $salida[] = $model;
         }
         return $salida;
     }
 
-    public static function create($data) // V2.0
+    /**
+     * Inserta en la base un registro nuevo.
+     * @param $data
+     * @return static
+     * @throws DBInsertException
+     */
+    public static function create($data)
     {
-        // TODO
-        // TODO
-        // TODO
-        // TODO EN este moemnto el array de data solo contiene los datos a insertar por eso devuelve error
-        // TODO Debería recibir un array asociativo que contenga campo_de_la_base => valor
-        // TODO
-        // TODO
-        $data = static::filterData($data);
-        echo "<pre>";
-        print_r($data); die;
-        echo "</pre>";
 
-        $query = static::generateCreateQuery($data);
+        $data = static::filterData($data);
+
+        $query = static::createQuery($data);
+
         $stmt = Connection::getStatement($query);
 
+
         if($stmt->execute($data)) {
-            // Si el insert se hace con exito creamos una instancia del modelo.
+            // Si el insert se hace con éxito creamos una instancia del modelo.
             $model = new static;
-            $model->cargarDatos($data);
             // Luego le insertamos el ID al modelo.
             $model->setPrimaryKey(Connection::getConnection()->lastInsertId());
+            $model->cargarDatos($data);
             return $model;
         } else {
             throw new DBInsertException('Error al insertar el registro.');
+        }
+    }
+
+    /**
+     * Edita un registro de la base.
+     * @param $data
+     * @return static
+     * @throws DBUpdateException
+     */
+    public static function edit($data)
+    {
+
+        $data = static::filterData($data);
+
+        $query = static::editQuery($data);
+        $stmt = Connection::getStatement($query);
+        if($stmt->execute($data)) {
+            // Si el insert se hace con éxito creamos una instancia del modelo.
+            $model = new static;
+
+            $model->cargarDatos($data);
+            return $model;
+        } else {
+            throw new DBUpdateException('Error al editar el registro.');
         }
     }
 
@@ -138,9 +276,22 @@ class MainModel
     {
         foreach ($datos as $campoNombre => $dato) {
             // Si en el array hay datos que no están permitidos los sacamos del array.
-            if(!in_array($campoNombre, static::$atributosPermitidos)) {
+            if(!in_array($campoNombre, static::$atributes)) {
                 unset($datos[$campoNombre]);
             }
+            // Encryptamos la contraseña
+            if($campoNombre === 'password') {
+                $datos['password'] = Hash::encrypt($dato);
+            }
+            // Seteamos el valor de la fecha a ahora.
+            if($campoNombre === 'date_added' && $dato === null) {
+                $datos['date_added'] = date("Y-m-d H:i:s");
+            }
+            // Si el campo de la imagen está vació le cargamos un valor por defecto.
+            if($campoNombre === 'image' && $dato === null) {
+                $datos['image'] = 'default.jpg';
+            }
+
         }
         // Devolvemos los datos filtrados.
         return $datos;
@@ -151,7 +302,7 @@ class MainModel
      * @param array $datos
      * @return string
      */
-    protected static function generateCreateQuery($datos)
+    protected static function createQuery($datos)
     {
         // Definimos la estructura base de nuestro query.
         $query = "INSERT INTO " . static::$table . " (";
@@ -161,7 +312,8 @@ class MainModel
         $campos = [];
         $holders = [];
         foreach ($datos as $campoNombre => $dato) {
-            if(in_array($campoNombre, static::$atributosPermitidos)) {
+            if(in_array($campoNombre, static::$atributes)) {
+
                 $campos[] = $campoNombre;
                 $holders[] = ":" . $campoNombre;
             }
@@ -174,20 +326,50 @@ class MainModel
     }
 
     /**
+     * Retorna una UPDATE QUERY genérica.
+     * @param array $datos
      * @return string
      */
-    public static function getPrimaryKey()
+    protected static function editQuery($datos)
     {
-        return self::$primaryKey;
+        // Definimos la estructura base de nuestro query.
+        $query = "UPDATE " . static::$table . " SET ";
+        $queryValues = "";
+        $queryCond = "WHERE id=";
+        // Recorremos los datos.
+        $values = [];
+        foreach ($datos as $campoNombre => $dato) {
+            if(in_array($campoNombre, static::$atributes)) {
+                if($campoNombre === 'id') continue;
+                $values[] = "$campoNombre = :$campoNombre";
+
+            }
+        }
+
+        // Unificamos los campos y holders en el query.
+
+        $queryValues .= implode(', ', $values);
+        $queryCond .= ":id";
+        return $query . " " . $queryValues . " " . $queryCond;
     }
 
     /**
-     * @param string $primaryKey
+     * @return string
      */
-    public static function setPrimaryKey($primaryKey)
+    public function getPrimaryKey()
     {
-        self::$primaryKey = $primaryKey;
+        return $this->{static::$primaryKey};
     }
+
+    /**
+     * @param $pk
+     * @internal param string $primaryKey
+     */
+    public function setPrimaryKey($pk)
+    {
+        $this->{static::$primaryKey} = $pk;
+    }
+
 
 
 }

@@ -9,7 +9,7 @@
 namespace FrameApi\Controllers;
 
 
-class UsersController
+class UsersController extends MainController
 {
 
 }

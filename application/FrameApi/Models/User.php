@@ -9,7 +9,170 @@
 namespace FrameApi\Models;
 
 
-class User
-{
+use FrameApi\DB\Connection;
+use PDO;
 
+/**
+ * Class User
+ * @package FrameApi\Models
+ */
+class User extends MainModel implements \JsonSerializable
+{
+    /** @var int ID del usuario */
+    protected $id;
+
+    /** @var string Nombre del usuario */
+    protected $name;
+
+    /** @var string Apellido del usuario */
+    protected $last_name;
+
+    /** @var string Email del usuario */
+    protected $email;
+
+    /** @var string Password del usuario */
+    protected $password;
+
+
+    /**
+     * Array con los campos permitidos para la tabla users.
+     * @var array
+     */
+    protected static $atributes = [
+        'id',
+        'name',
+        'last_name',
+        'email',
+        'password'
+    ];
+
+    /**
+     * Nombre de la tabla en la DB
+     * @var string
+     */
+    protected static $table = 'users';
+
+
+    /**
+     * Busca a un usuario por su mail.
+     * @param string $userName
+     * @return bool
+     */
+    public function getByName($userName)
+    {
+        $query = "SELECT * FROM users
+                  WHERE name = ?";
+        $stmt = Connection::getStatement($query);
+        $stmt->execute([$userName]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+        if($userData) {
+            $this->cargarDatos($userData);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastName()
+    {
+        return $this->last_name;
+    }
+
+    /**
+     * @param mixed $last_name
+     */
+    public function setLastName($last_name)
+    {
+        $this->last_name = $last_name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param mixed $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return [
+            'id'=> $this->getId(),
+            'name'=> $this->getName(),
+            'last_name'=> $this->getLastName(),
+            'email'=> $this->getEmail(),
+            'password'=> $this->getPassword()
+        ];
+    }
 }

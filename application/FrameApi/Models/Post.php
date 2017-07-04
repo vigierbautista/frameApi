@@ -9,16 +9,49 @@
 namespace FrameApi\Models;
 
 
+use FrameApi\Exceptions\UndefinedMethodException;
+
+/**
+ * Class Post
+ * @package FrameApi\Models
+ */
 class Post extends MainModel implements \JsonSerializable
 {
+    /** @var int ID del post */
     protected $id;
+
+    /** @var string Titulo del post */
     protected $title;
+
+    /** @var string Nombre de la imagen del post */
     protected $image;
+
+    /** @var string Contenido del post */
     protected $content;
+
+    /** @var string Fecha de creación del post */
     protected $date_added;
+
+    /** @var int Fk del usuario que creo el post */
     protected $id_user;
 
+    /** @var array de los nombres de los campos que son FK */
+    protected static $fk = [
+        'id_user'
+    ];
+
+    /**
+     * Variable que guarda una Instancia de User
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * Array con los campos permitidos para la tabla posts.
+     * @var array
+     */
     protected static $atributes = [
+        'id',
         'title',
         'image',
         'content',
@@ -26,7 +59,13 @@ class Post extends MainModel implements \JsonSerializable
         'id_user'
     ];
 
+    /**
+     * Nombre de la tabla en la DB.
+     * @var string
+     */
     protected static $table = 'posts';
+
+
 
 
     /**
@@ -40,33 +79,13 @@ class Post extends MainModel implements \JsonSerializable
             'title'=> $this->getTitle(),
             'image'=> $this->getImage(),
             'content'=> $this->getContent(),
-            'id_user'=> $this->getIdUser()
+            'date_added'=> $this->getDateAdded(),
+            'id_user'=> $this->getIdUser(),
+            'user'=> $this->user->getName(),
         ];
     }
 
 
-
-    /**
-     * Retorna los métodos get de cada propiedad del modelo.
-     * Esta función se ejecuta automágicamente  en el MainModel->cargarDatos;
-     * @param string $attrName  El nombre de la propiedad.
-     * @return mixed    El valor correspondiente a esa propiedad.
-     */
-    public function __get($attrName)
-    {
-        // Armamos el método: Ej: getTitle
-        $getterName = "get" . ucfirst($attrName);
-
-        // Verificamos si el método existe.
-        if(method_exists($this, $getterName)) {
-
-            return $this->{$getterName}();
-        } else {
-
-            return null;
-        }
-
-    }
 
 
 
@@ -139,6 +158,22 @@ class Post extends MainModel implements \JsonSerializable
     /**
      * @return mixed
      */
+    public function getDateAdded()
+    {
+        return $this->date_added;
+    }
+
+    /**
+     * @param mixed $date_added
+     */
+    public function setDateAdded($date_added)
+    {
+        $this->date_added = $date_added;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getIdUser()
     {
         return $this->id_user;
@@ -153,18 +188,10 @@ class Post extends MainModel implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getDateAdded()
+    public static function getFk()
     {
-        return $this->date_added;
-    }
-
-    /**
-     * @param mixed $date_added
-     */
-    public function setDateAdded($date_added)
-    {
-        $this->date_added = $date_added;
+        return self::$fk;
     }
 }

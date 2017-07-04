@@ -6,6 +6,7 @@
  * Time: 5:29 PM
  */
 
+use FrameApi\Core\App;
 use FrameApi\Exceptions\BadRequestException;
 use FrameApi\View\View;
 
@@ -22,8 +23,11 @@ $rootPath = str_replace('\\', '/', $rootPath);
 // Requerimos las rutas de la aplicación.
 require $rootPath . '/application/routes.php';
 
+// Requerimos el autoload del vendor.
+require $rootPath . '/application/vendor/autoload.php';
+
 // Instanciamos nuestra App.
-$App = new \FrameApi\Core\App($rootPath);
+$App = new App($rootPath);
 
 
 // Arrancamos la App.

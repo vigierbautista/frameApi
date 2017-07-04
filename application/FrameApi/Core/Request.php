@@ -29,7 +29,18 @@ class Request
      */
     protected $method;
 
+    /**
+     * Datos que llegan por POST.
+     * @var
+     */
     protected $data;
+
+    /**
+     * Headers de la petición.
+     * @var array
+     */
+    protected $headers;
+
 
     /**
      * Request constructor.
@@ -45,6 +56,9 @@ class Request
 
         // Guardamos solo lo que sigue después de public/
         $this->url = str_replace(App::getPublicPath(), '', $rutaAbsoluta);
+
+        // Cargamos los headers
+        $this->headers = apache_request_headers();
 
         $this->loadData();
 
@@ -70,6 +84,18 @@ class Request
     }
 
     /**
+     * Busca los datos del buffer de entrada de php
+     */
+    protected function loadPostData()
+    {
+        $entradaPost = file_get_contents('php://input');
+
+        $datosPost = json_decode($entradaPost, true);
+        $this->data = $datosPost;
+    }
+
+
+    /**
      * @return string
      */
     public function getUrl()
@@ -80,18 +106,19 @@ class Request
     /**
      * @return string
      */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * @return string
+     */
     public function getMethod()
     {
         return $this->method;
     }
 
-    protected function loadPostData()
-    {
-        $entradaPost = file_get_contents('php://input');
-
-        $datosPost = json_decode($entradaPost, true);
-        $this->data = $datosPost;
-    }
 
     /**
      * @return mixed

@@ -20,9 +20,25 @@ Route::setRoute('POST', '/posts/save', 'PostsController@save');
 Route::setRoute('PUT', '/posts/edit', 'PostsController@edit');
 
 /**
+ * Rutas de Users.
+ */
+Route::setRoute('GET', '/users', 'UsersController@index');
+Route::setRoute('GET', '/users/{id}', 'UsersController@get');
+Route::setRoute('POST', '/users/save', 'UsersController@save');
+Route::setRoute('PUT', '/users/edit', 'UsersController@edit');
+Route::setRoute('DELETE', '/users/delete', 'UsersController@delete');
+
+/**
+ * Rutas de Login
+ */
+Route::setRoute('POST', '/register', 'AuthController@register');
+Route::setRoute('POST', '/login', 'AuthController@login');
+Route::setRoute('POST', '/logout', 'AuthController@logout');
+
+/**
  * Rutas de Comments.
  */
-Route::setRoute('GET', '/comments', 'Comments@index');
-Route::setRoute('GET', '/comments/{id}', 'Comments@get');
-Route::setRoute('POST', '/comments/save', 'Comments@save');
-Route::setRoute('DELETE', '/comments/delete', 'Comments@delete');
+Route::setRoute('GET', '/comments', 'CommentsController@index');
+Route::setRoute('GET', '/comments/{id}', 'CommentsController@getOfPost');
+Route::setRoute('POST', '/comments/save', 'CommentsController@save');
+Route::setRoute('DELETE', '/comments/delete', 'CommentsController@delete');

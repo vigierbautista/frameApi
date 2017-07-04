@@ -52,20 +52,20 @@ class Connection implements ConnectionInterface
      * Constructor estático para
      * Connection constructor.
      */
-    private function __construct() {
-        self::$host = _DBSERVER_;
-        self::$user = _DBUSER_;
-        self::$pass = _DBPASS_;
-        self::$base = _DBNAME_;
-    }
+    private function __construct()
+    {}
 
     /**
      * Crea la conexón a la base de datos.
      */
     private static function connect()
     {
-        $dsn = "mysql:host=".self::$host.";dbname=".self::$base.";charset=utf8";
+        self::$host = _DBSERVER_;
+        self::$user = _DBUSER_;
+        self::$pass = _DBPASS_;
+        self::$base = _DBNAME_;
 
+        $dsn = "mysql:host=".self::$host.";dbname=".self::$base.";charset=utf8";
         self::$db = new PDO($dsn, self::$user, self::$pass);
     }
 
