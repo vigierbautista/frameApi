@@ -13,8 +13,8 @@ use FrameApi\Core\Request;
 use FrameApi\Core\Route;
 use FrameApi\Exceptions\DBGetException;
 use FrameApi\Exceptions\DBInsertException;
-use FrameApi\Exceptions\DBUpdateException;
 use FrameApi\Security\Token;
+use FrameApi\Validation\Validator;
 use FrameApi\View\View;
 
 /**
@@ -82,11 +82,11 @@ class MainController
             ];
         }
 
-        View::renderJson($output);
+		View::renderJson($output);
     }
 
     /**
-     * Guarda un Post en la base y devuelve el post insertado.
+     * Guarda una Instancia del modelo en la base y lo devuelve.
      * @param Request $request
      */
     public function save(Request $request)
@@ -98,25 +98,37 @@ class MainController
         $token = $request->getHeaders()['X-Token'];
 
         if(Token::verifyToken($token)) {
-            // TODO validar datos.
-            // Guardamos el post en la base.
-            try {
-                $model = $this->model;
-                $newOne = $model::create($data);
+			$model = $this->model;
 
-                $output = [
-                    'status' => 1,
-                    'data' => $newOne,
-                    'msg' => 'Publicación realizada exitosamente.'
-                ];
+            $Validator = new Validator($data, $this->model->getValidationRules(), $this->model->getValidationMsgs());
 
-            } catch (DBInsertException $e) {
-                $output = [
-                    'status' => 0,
-                    'msg' => $e->getMessage()
-                ];
+            if ($Validator->isValid()) {
+				// Guardamos el post en la base.
 
-            }
+				try {
+					$newOne = $model::create($data);
+
+					$output = [
+						'status' => 1,
+						'data' => $newOne,
+						'msg' => 'Publicación realizada exitosamente.'
+					];
+
+				} catch (DBInsertException $e) {
+					$output = [
+						'status' => 0,
+						'msg' => $e->getMessage()
+					];
+				}
+
+			} else {
+				$output = [
+					'status' => 0,
+					'msg' => 'Datos incorrectos',
+					'errors' => $Validator->getErrors()
+				];
+			}
+
 
         } else {
             $output = [
@@ -125,12 +137,15 @@ class MainController
             ];
         }
 
-
         View::renderJson($output);
-
 
     }
 
+
+	/**
+	 * Edita un registro de la base de datos
+	 * @param Request $request
+	 */
     public function edit(Request $request)
     {
         // Buscamos los datos en el request
@@ -138,27 +153,28 @@ class MainController
         $token = $request->getHeaders()['X-Token'];
 
         if(Token::verifyToken($token)) {
-            // TODO validar datos.
-            // Guardamos el post en la base.
-            try {
-                $model = $this->model;
-                $edited = $model::edit($data);
 
-                $output = [
-                    'status' => 1,
-                    'data' => $edited,
-                    'msg' => 'Edición realizada exitosamente.'
-                ];
+			$Validator = new Validator($data, $this->model->getValidationRules(), $this->model->getValidationMsgs());
 
-            } catch (DBUpdateException $e) {
-                $output = [
-                    'status' => 0,
-                    'msg' => $e->getMessage()
-                ];
+			if ($Validator->isValid()) {
+				// Guardamos el post en la base.
+				$model = $this->model;
+				$edited = $model::edit($data);
 
-            }
+				$output = [
+					'status' => 1,
+					'data' => $edited,
+					'msg' => 'Edición realizada exitosamente.'
+				];
+			} else {
+				$output = [
+					'status' => 0,
+					'msg' => 'Datos incorrectos',
+					'errors' => $Validator->getErrors()
+				];
+			}
 
-        } else {
+		} else {
             $output = [
                 'status' => 0,
                 'msg' => "El token es inválido"
