@@ -82,8 +82,6 @@ class Authenticate
             'msg' => 'Ya estás logueado!'
         ];
 
-
-
     }
 
 
