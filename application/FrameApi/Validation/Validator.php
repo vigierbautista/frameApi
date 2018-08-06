@@ -246,6 +246,25 @@ class Validator
 		}
 		return true;
 	}
+	//TODO PASSWORD VALIDATION
+	protected function _password($fieldName) {
+
+		if ($this->data[$fieldName] < 5) {
+			$this->addError($fieldName, $this->msgs[$fieldName]['password']);
+			return false;
+		}
+		if ($this->data[$fieldName] < 5) {
+			$this->addError($fieldName, $this->msgs[$fieldName]['password']);
+			return false;
+		}
+		if ($this->data[$fieldName] < 5) {
+			$this->addError($fieldName, $this->msgs[$fieldName]['password']);
+			return false;
+		}
+
+		return true;
+
+	}
 
 	/**
 	 * Valida que el valor del $fieldName sea único.

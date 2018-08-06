@@ -47,7 +47,8 @@ class AuthController
 			} catch (InvalidLoginException $e) {
 				$output = [
 					'status' => 0,
-					'msg' => $e->getMessage()
+					'msg' => 'Hubo un error en el login.',
+					'errors' => [$e->getMessage()]
 				];
 
 			}
@@ -72,14 +73,22 @@ class AuthController
         $data = $request->getData();
 
 		$Validator = new Validator($data, [
-			'name' => ['required'],
-			'last_name' => ['required'],
+			'name' => ['required', 'min:3', 'max:20'],
+			'last_name' => ['required', 'min:3', 'max:20'],
 			'email' => ['required', 'email'],
 			'password' => ['required', 'password'],
 			'password2' => ['required', 'equal:password']
 		], [
-			'name' => ['required' => 'Ingrese su nombre'],
-			'last_name' => ['required' => 'Ingrese su apellido'],
+			'name' => [
+				'required' => 'Ingrese su nombre',
+				'min' => 'Su nombre debe tener al menos 3 caracteres.',
+				'max' => 'Su nombre debe tener un máximo de 20 caracteres.',
+			],
+			'last_name' => [
+				'required' => 'Ingrese su apellido',
+				'min' => 'Su apellido debe tener al menos 3 caracteres.',
+				'max' => 'Su apellido debe tener un máximo de 20 caracteres.',
+			],
 			'email' => [
 				'required' => 'Ingrese su email',
 				'email' => 'El formato del email debe ser ejemplo@dominio.com'
