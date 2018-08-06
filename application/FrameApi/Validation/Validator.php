@@ -246,18 +246,18 @@ class Validator
 		}
 		return true;
 	}
-	//TODO PASSWORD VALIDATION
-	protected function _password($fieldName) {
 
-		if ($this->data[$fieldName] < 5) {
-			$this->addError($fieldName, $this->msgs[$fieldName]['password']);
-			return false;
-		}
-		if ($this->data[$fieldName] < 5) {
-			$this->addError($fieldName, $this->msgs[$fieldName]['password']);
-			return false;
-		}
-		if ($this->data[$fieldName] < 5) {
+	/**
+	 * Valida que el valor del $fieldname tenga más de 5 caracteres, una mayúscula y un número.
+	 * @param $fieldName
+	 * @return bool
+	 */
+	protected function _password($fieldName) {
+		if (
+			strlen($this->data[$fieldName]) < 5
+			|| !preg_match('/[0-9]/', $this->data[$fieldName])
+			|| !preg_match('/[A-Z]/', $this->data[$fieldName])
+		) {
 			$this->addError($fieldName, $this->msgs[$fieldName]['password']);
 			return false;
 		}
@@ -274,8 +274,10 @@ class Validator
 	 * @return bool
 	 */
 	protected function _unique($fieldName, $table) {
-		$result = Connection::select(" SELECT * FROM $table WHERE $fieldName = $this->data[$fieldName] LIMIT 1");
-		if (!$result) {
+		$data = $this->data[$fieldName];
+		$result = Connection::select(" SELECT * FROM $table WHERE $fieldName = '$data' LIMIT 1");
+
+		if ($result) {
 			$this->addError($fieldName, $this->msgs[$fieldName]['unique']);
 			return false;
 		}

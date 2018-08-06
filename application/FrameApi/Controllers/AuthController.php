@@ -11,6 +11,7 @@ use FrameApi\Auth\Authenticate;
 use FrameApi\Core\Request;
 use FrameApi\Exceptions\DBInsertException;
 use FrameApi\Exceptions\InvalidLoginException;
+use FrameApi\Exceptions\UndefinedValidationMethodException;
 use FrameApi\Models\User;
 use FrameApi\Validation\Validator;
 use FrameApi\View\View;
@@ -21,10 +22,11 @@ use FrameApi\View\View;
  */
 class AuthController
 {
-    /**
-     * Buscamos los datos del usuario, lo logueamos y luego lo imprimimos
-     * @param Request $request
-     */
+	/**
+	 * Buscamos los datos del usuario, lo logueamos y luego lo imprimimos
+	 * @param Request $request
+	 * @throws \FrameApi\Exceptions\DBGetException
+	 */
     public function login(Request $request) {
 
         // Buscamos los datos en el request
@@ -75,7 +77,7 @@ class AuthController
 		$Validator = new Validator($data, [
 			'name' => ['required', 'min:3', 'max:20'],
 			'last_name' => ['required', 'min:3', 'max:20'],
-			'email' => ['required', 'email'],
+			'email' => ['required', 'email', 'unique:users'],
 			'password' => ['required', 'password'],
 			'password2' => ['required', 'equal:password']
 		], [
@@ -91,11 +93,12 @@ class AuthController
 			],
 			'email' => [
 				'required' => 'Ingrese su email',
-				'email' => 'El formato del email debe ser ejemplo@dominio.com'
+				'email' => 'El formato del email debe ser ejemplo@dominio.com',
+				'unique' => 'Ese email ya se encuentra registrado.'
 			],
 			'password' => [
 				'required' => 'Ingrese su contraseña',
-				'password' => 'La contraseña debe tener un mínimo de 5 caracteres, una mayúscula y un número'
+				'password' => 'La contraseña debe tener un mínimo de 5 caracteres, una mayúscula y un número.'
 			],
 			'password2' => [
 				'required' => 'Repita la contraseña',
