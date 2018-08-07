@@ -7,9 +7,9 @@
  */
 
 namespace FrameApi\Models;
+use FrameApi\Exceptions\DBGetException;
+use FrameApi\View\View;
 
-
-use FrameApi\Exceptions\UndefinedMethodException;
 
 /**
  * Class Post
@@ -66,6 +66,40 @@ class Post extends MainModel implements \JsonSerializable
     protected static $table = 'posts';
 
 
+    protected static $validation_rules = [
+		'title' => ['required', 'max:30'],
+		'content' => ['max:1000']
+	];
+
+
+    protected static $validation_msgs = [
+		'title' => [
+			'required' => 'Ingrese el titulo',
+			'max' => 'El titulo debe tener un máximo de 30 caracteres'
+		],
+		'content' => [
+			'max' => 'El contenido debe tener un máximo de 1.000 caracteres'
+		]
+	];
+
+	/**
+	 * Post constructor.
+	 * @param null $pk
+	 */
+	public function __construct($pk = null)
+	{
+		try {
+
+			parent::__construct($pk);
+
+		} catch (DBGetException $e) {
+			View::renderJson([
+				'status' => 0,
+				'msg' => $e->getMessage()
+			]);
+		}
+	}
+
 
 
     /**
@@ -84,10 +118,6 @@ class Post extends MainModel implements \JsonSerializable
             'user'=> $this->user->getName(),
         ];
     }
-
-
-
-
 
 
 

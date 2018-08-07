@@ -16,7 +16,6 @@ use FrameApi\Exceptions\DBInsertException;
 use FrameApi\Exceptions\DBUpdateException;
 use FrameApi\Exceptions\UndefinedMethodException;
 use FrameApi\Security\Hash;
-use FrameApi\Security\Token;
 use PDO;
 
 /**
@@ -46,10 +45,19 @@ class MainModel
 
     protected static $fk;
 
-    /**
-     * Modelo constructor.
-     * @param int|null $pk
-     */
+	/** @var $validation_rules array Reglas de validación */
+	protected static $validation_rules = [];
+
+
+	/** @var $validation_msgs array Mensajes de error */
+	protected static $validation_msgs = [];
+
+
+	/**
+	 * Modelo constructor.
+	 * @param int|null $pk
+	 * @throws DBGetException
+	 */
     public function __construct($pk = null)
     {
         if(!is_null($pk)) {
@@ -195,7 +203,7 @@ class MainModel
     public static function getAll()
     {
 
-        $query = "SELECT * FROM " . static::$table;
+        $query = "SELECT * FROM " . static::$table . " ORDER BY date_added DESC";
 
         $stmt = Connection::getStatement($query);
 
@@ -235,7 +243,7 @@ class MainModel
             // Si el insert se hace con éxito creamos una instancia del modelo.
             $model = new static;
             // Luego le insertamos el ID al modelo.
-            $model->setPrimaryKey(Connection::getConnection()->lastInsertId());
+            $model->setPrimaryKey(Connection::lastInsertedId());
             $model->cargarDatos($data);
             return $model;
         } else {
@@ -370,6 +378,20 @@ class MainModel
         $this->{static::$primaryKey} = $pk;
     }
 
+	/**
+	 * @return array
+	 */
+	public static function getValidationRules()
+	{
+		return static::$validation_rules;
+	}
 
+	/**
+	 * @return array
+	 */
+	public static function getValidationMsgs()
+	{
+		return static::$validation_msgs;
+	}
 
 }

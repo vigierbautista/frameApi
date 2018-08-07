@@ -10,6 +10,8 @@ namespace FrameApi\Models;
 
 
 use FrameApi\DB\Connection;
+use FrameApi\Exceptions\DBGetException;
+use FrameApi\View\View;
 use PDO;
 
 class Comment extends MainModel implements \JsonSerializable
@@ -68,8 +70,44 @@ class Comment extends MainModel implements \JsonSerializable
      */
     protected static $table = 'comments';
 
+	protected static $validation_rules = [
+		'comment' => ['required', 'min:5', 'max:500']
+	];
 
-    public static function getAllOfPost($postId)
+
+	protected static $validation_msgs = [
+		'comment' => [
+			'required' => 'Ingrese su comentario',
+			'min' => 'El comentario debe tener un mínimo de 5 caracteres',
+			'max' => 'El comentario debe tener un máximo de 500 caracteres'
+		]
+	];
+
+	/**
+	 * Comment constructor.
+	 * @param null $pk
+	 */
+    public function __construct($pk = null)
+	{
+		try {
+
+			parent::__construct($pk);
+
+		} catch (DBGetException $e) {
+			View::renderJson([
+				'status' => 0,
+				'msg' => $e->getMessage()
+			]);
+		}
+	}
+
+
+	/**
+	 * Busca todos los comentarios de un post especifico.
+	 * @param $postId
+	 * @return array
+	 */
+	public static function getAllOfPost($postId)
     {
         $query = "SELECT *
                   FROM comments
@@ -239,6 +277,5 @@ class Comment extends MainModel implements \JsonSerializable
     {
         self::$fk = $fk;
     }
-
 
 }

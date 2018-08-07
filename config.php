@@ -16,6 +16,10 @@ ini_set('display_startup_errors', 1);
 ini_set('html_errors', false);
 error_reporting(E_ALL);
 
+# CORS
+header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
+header('Access-Control-Allow-Origin: *');
 
 /**
  * Default timezone

@@ -20,14 +20,15 @@ class Authenticate
      */
     protected static $user = null;
 
-    /**
-     * Loguea un usuario
-     * @param $userName
-     * @param $pass
-     * @param bool $apiResponse | optional: indica si la respuesta debe tratarse como Api
-     * @return array
-     * @throws InvalidLoginException
-     */
+	/**
+	 * Loguea un usuario
+	 * @param $userName
+	 * @param $pass
+	 * @param bool $apiResponse | optional: indica si la respuesta debe tratarse como Api
+	 * @return array
+	 * @throws InvalidLoginException
+	 * @throws \FrameApi\Exceptions\DBGetException
+	 */
     public static function login($userName, $pass, $apiResponse = true)
     {
         $user = new User;
@@ -62,6 +63,10 @@ class Authenticate
 
         }
 
+		return [
+			'status' => 0,
+			'msg' => 'Error de login.'
+		];
 
     }
 
@@ -79,10 +84,8 @@ class Authenticate
             'status' => 1,
             'token' => $authToken,
             'data'  => $user,
-            'msg' => 'Ya estás logueado!'
+            'msg' => 'Cuenta creada con éxito'
         ];
-
-
 
     }
 
