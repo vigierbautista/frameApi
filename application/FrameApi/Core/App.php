@@ -41,7 +41,7 @@ class App
     {
         self::$rootPath = $rootPath;
         self::$appPath = $rootPath . '/application';
-        self::$publicPath = $rootPath . '/public';
+        self::$publicPath = $rootPath . '/public_html';
         self::$viewsPath = $rootPath . '/views';
     }
 
@@ -63,7 +63,7 @@ class App
             $this->executeController($controller);
 
         } else {
-            throw new BadRequestException("No existe la ruta especificada.");
+            throw new BadRequestException("No existe la ruta especificada: " . $this->request->getUrl());
         }
     }
 

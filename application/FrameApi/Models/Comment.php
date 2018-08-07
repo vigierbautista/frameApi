@@ -70,6 +70,18 @@ class Comment extends MainModel implements \JsonSerializable
      */
     protected static $table = 'comments';
 
+	protected static $validation_rules = [
+		'comment' => ['required', 'min:5', 'max:500']
+	];
+
+
+	protected static $validation_msgs = [
+		'comment' => [
+			'required' => 'Ingrese su comentario',
+			'min' => 'El comentario debe tener un mínimo de 5 caracteres',
+			'max' => 'El comentario debe tener un máximo de 500 caracteres'
+		]
+	];
 
 	/**
 	 * Comment constructor.
@@ -77,17 +89,6 @@ class Comment extends MainModel implements \JsonSerializable
 	 */
     public function __construct($pk = null)
 	{
-		$this->validation_rules = [
-			'comment' => ['required', 'max:10000']
-		];
-
-		$this->validation_msgs = [
-			'comment' => [
-				'required' => 'Ingrese su comentario',
-				'max' => 'El comentario debe tener un máximo de 10.000 caracteres'
-			]
-		];
-
 		try {
 
 			parent::__construct($pk);
@@ -277,20 +278,4 @@ class Comment extends MainModel implements \JsonSerializable
         self::$fk = $fk;
     }
 
-
-	/**
-	 * @return array
-	 */
-	public function getValidationRules()
-	{
-		return $this->validation_rules;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getValidationMsgs()
-	{
-		return $this->validation_msgs;
-	}
 }

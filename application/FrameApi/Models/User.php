@@ -53,6 +53,25 @@ class User extends MainModel implements \JsonSerializable
     protected static $table = 'users';
 
 
+	protected static $validation_rules = [
+		'name' => ['required', 'min:3', 'max:20'],
+		'last_name' => ['required', 'min:3', 'max:20']
+	];
+
+
+	protected static $validation_msgs = [
+		'name' => [
+			'required' => 'Ingrese su nombre',
+			'min' => 'Su nombre debe tener al menos 3 caracteres.',
+			'max' => 'Su nombre debe tener un máximo de 20 caracteres.',
+		],
+		'last_name' => [
+			'required' => 'Ingrese su apellido',
+			'min' => 'Su apellido debe tener al menos 3 caracteres.',
+			'max' => 'Su apellido debe tener un máximo de 20 caracteres.',
+		]
+	];
+
     /**
      * Busca a un usuario por su mail.
      * @param string $userName
