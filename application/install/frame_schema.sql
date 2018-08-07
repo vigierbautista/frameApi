@@ -1,7 +1,7 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versión del servidor:         5.6.17 - MySQL Community Server (GPL)
--- SO del servidor:              Win64
+-- Versión del servidor:         10.1.30-MariaDB - mariadb.org binary distribution
+-- SO del servidor:              Win32
 -- HeidiSQL Versión:             9.4.0.5125
 -- --------------------------------------------------------
 
@@ -10,6 +10,11 @@
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+
+-- Volcando estructura de base de datos para frame
+CREATE DATABASE IF NOT EXISTS `frame` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `frame`;
 
 -- Volcando estructura para tabla frame.comments
 CREATE TABLE IF NOT EXISTS `comments` (
@@ -23,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `comments` (
   KEY `fk_users` (`id_user`),
   CONSTRAINT `fk_posts` FOREIGN KEY (`id_post`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_users` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
 
 -- La exportación de datos fue deseleccionada.
 -- Volcando estructura para tabla frame.posts
@@ -36,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
   `id_user` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `id_user` (`id_user`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
 
 -- La exportación de datos fue deseleccionada.
 -- Volcando estructura para tabla frame.users
@@ -50,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `image` varchar(255) DEFAULT 'default.png',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8;
 
 -- La exportación de datos fue deseleccionada.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
