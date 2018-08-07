@@ -46,11 +46,11 @@ class MainModel
     protected static $fk;
 
 	/** @var $validation_rules array Reglas de validación */
-	protected $validation_rules = [];
+	protected static $validation_rules = [];
 
 
 	/** @var $validation_msgs array Mensajes de error */
-	protected $validation_msgs = [];
+	protected static $validation_msgs = [];
 
 
 	/**
@@ -203,7 +203,7 @@ class MainModel
     public static function getAll()
     {
 
-        $query = "SELECT * FROM " . static::$table;
+        $query = "SELECT * FROM " . static::$table . " ORDER BY date_added DESC";
 
         $stmt = Connection::getStatement($query);
 
@@ -381,17 +381,17 @@ class MainModel
 	/**
 	 * @return array
 	 */
-	public function getValidationRules()
+	public static function getValidationRules()
 	{
-		return $this->validation_rules;
+		return static::$validation_rules;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getValidationMsgs()
+	public static function getValidationMsgs()
 	{
-		return $this->validation_msgs;
+		return static::$validation_msgs;
 	}
 
 }

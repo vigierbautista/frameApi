@@ -13,6 +13,7 @@ use FrameApi\Core\Request;
 use FrameApi\Core\Route;
 use FrameApi\Exceptions\DBGetException;
 use FrameApi\Exceptions\DBInsertException;
+use FrameApi\Models\MainModel;
 use FrameApi\Security\Token;
 use FrameApi\Validation\Validator;
 use FrameApi\View\View;
@@ -23,7 +24,10 @@ use FrameApi\View\View;
  */
 class MainController
 {
-
+	/**
+	 * @type MainModel
+	 * @var mixed
+	 */
     protected $model;
 
     public function __construct()
@@ -99,8 +103,7 @@ class MainController
 
         if(Token::verifyToken($token)) {
 			$model = $this->model;
-
-            $Validator = new Validator($data, $this->model->getValidationRules(), $this->model->getValidationMsgs());
+            $Validator = new Validator($data, $model::getValidationRules(), $model::getValidationMsgs());
 
             if ($Validator->isValid()) {
 				// Guardamos el post en la base.
@@ -153,12 +156,12 @@ class MainController
         $token = $request->getHeaders()['X-Token'];
 
         if(Token::verifyToken($token)) {
-
-			$Validator = new Validator($data, $this->model->getValidationRules(), $this->model->getValidationMsgs());
+			$model = $this->model;
+			$Validator = new Validator($data, $model::getValidationRules(), $model::getValidationMsgs());
 
 			if ($Validator->isValid()) {
 				// Guardamos el post en la base.
-				$model = $this->model;
+
 				$edited = $model::edit($data);
 
 				$output = [
