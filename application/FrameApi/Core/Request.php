@@ -35,6 +35,12 @@ class Request
      */
     protected $data;
 
+	/**
+	 * Archivos que llegan por POST
+	 * @var
+	 */
+    protected $files = [];
+
     /**
      * Headers de la petición.
      * @var array
@@ -75,6 +81,7 @@ class Request
 
             case "POST":
                 $this->loadPostData();
+                $this->loadFiles();
                 break;
 
             default:
@@ -91,8 +98,22 @@ class Request
         $entradaPost = file_get_contents('php://input');
 
         $datosPost = json_decode($entradaPost, true);
-        $this->data = $datosPost;
-    }
+
+        if (!$datosPost) {
+        	$this->data = $_POST;
+		} else {
+			$this->data = $datosPost;
+		}
+
+	}
+
+
+	private function loadFiles()
+	{
+		if (!empty($_FILES)) {
+			$this->files = $_FILES;
+		}
+	}
 
 
     /**
@@ -127,5 +148,10 @@ class Request
     {
         return $this->data;
     }
+
+	public function getFiles()
+	{
+		return $this->files;
+	}
 
 }

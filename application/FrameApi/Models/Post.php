@@ -35,9 +35,13 @@ class Post extends MainModel implements \JsonSerializable
     /** @var int Fk del usuario que creo el post */
     protected $id_user;
 
+    protected $id_category;
+
+
     /** @var array de los nombres de los campos que son FK */
     protected static $fk = [
-        'id_user'
+        'id_user',
+		'id_category'
     ];
 
     /**
@@ -46,17 +50,24 @@ class Post extends MainModel implements \JsonSerializable
      */
     protected $user;
 
+	/**
+	 * Variable que guarda una Instancia de Category
+	 * @var User
+	 */
+    protected $category;
+
     /**
      * Array con los campos permitidos para la tabla posts.
      * @var array
      */
-    protected static $atributes = [
+    protected static $attributes = [
         'id',
         'title',
         'image',
         'content',
         'date_added',
-        'id_user'
+        'id_user',
+		'id_category'
     ];
 
     /**
@@ -116,6 +127,8 @@ class Post extends MainModel implements \JsonSerializable
             'date_added'=> $this->getDateAdded(),
             'id_user'=> $this->getIdUser(),
             'user'=> $this->user->getName(),
+			'id_category' => $this->category->getId(),
+			'category' => $this->category->getName(),
         ];
     }
 
@@ -216,6 +229,22 @@ class Post extends MainModel implements \JsonSerializable
     {
         $this->id_user = $id_user;
     }
+
+	/**
+	 * @return mixed
+	 */
+	public function getIdCategory()
+	{
+		return $this->id_category;
+	}
+
+	/**
+	 * @param mixed $id_category
+	 */
+	public function setIdCategory($id_category)
+	{
+		$this->id_category = $id_category;
+	}
 
     /**
      * @return array

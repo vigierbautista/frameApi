@@ -46,7 +46,7 @@ class Authenticate
                         'status' => 1,
                         'token' => $authToken,
                         'data'  => $user,
-                        'msg' => 'Ya estás logueado!'
+                        'msg' => 'Bienvenido '. $user->getName() . '!'
                     ];
 
                 } else {

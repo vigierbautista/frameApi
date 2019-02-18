@@ -10,6 +10,7 @@
 namespace FrameApi\Models;
 
 
+use FrameApi\Core\App;
 use FrameApi\DB\Connection;
 use FrameApi\Exceptions\DBGetException;
 use FrameApi\Exceptions\DBInsertException;
@@ -28,7 +29,7 @@ class MainModel
      * Atributos del modelo permitidos.
      * @var array
      */
-    protected static $atributes = [];
+    protected static $attributes = [];
 
     /**
      * Nombre de la base del modelo.
@@ -65,7 +66,7 @@ class MainModel
         }
     }
 
-    /**
+	/**
      * Retorna los métodos get de cada propiedad del modelo.
      * Esta función se ejecuta automágicamente  en el MainModel->cargarDatos;
      * @param string $attrName  El nombre de la propiedad.
@@ -104,7 +105,7 @@ class MainModel
         if(method_exists($this, $methodName)) {
             $this->{$methodName}($value);
         } else {
-            throw new UndefinedMethodException('No existe un setter para ' . $attrName . ".");
+            throw new UndefinedMethodException('No existe un setter para ' . $attrName . ". En la clase " . get_class($this));
         }
     }
 
@@ -115,10 +116,9 @@ class MainModel
      */
     public function cargarDatos($data)
     {
-
         foreach ($data as $key => $value) {
 
-            if(in_array($key, static::$atributes)) {
+            if(in_array($key, static::$attributes)) {
 
                 $this->{$key} = $value;
             }
@@ -196,10 +196,11 @@ class MainModel
 
     }
 
-    /**
-     * Busca todos los registros de la tabla.
-     * @return array
-     */
+	/**
+	 * Busca todos los registros de la tabla.
+	 * @return array
+	 * @throws DBGetException
+	 */
     public static function getAll()
     {
 
@@ -223,12 +224,13 @@ class MainModel
         return $salida;
     }
 
-    /**
-     * Inserta en la base un registro nuevo.
-     * @param $data
-     * @return static
-     * @throws DBInsertException
-     */
+	/**
+	 * Inserta en la base un registro nuevo.
+	 * @param $data
+	 * @return static
+	 * @throws DBGetException
+	 * @throws DBInsertException
+	 */
     public static function create($data)
     {
 
@@ -251,12 +253,13 @@ class MainModel
         }
     }
 
-    /**
-     * Edita un registro de la base.
-     * @param $data
-     * @return static
-     * @throws DBUpdateException
-     */
+	/**
+	 * Edita un registro de la base.
+	 * @param $data
+	 * @return static
+	 * @throws DBUpdateException
+	 * @throws DBGetException
+	 */
     public static function edit($data)
     {
 
@@ -275,6 +278,15 @@ class MainModel
         }
     }
 
+
+    public static function delete($id)
+	{
+		$query = static::deleteQuery();
+		$stmt = Connection::getStatement($query);
+
+		return $stmt->execute([':id' => $id]);
+	}
+
     /**
      * Filtra del array de datos los campos que no existen o no están permitidos.
      * @param $datos
@@ -284,7 +296,7 @@ class MainModel
     {
         foreach ($datos as $campoNombre => $dato) {
             // Si en el array hay datos que no están permitidos los sacamos del array.
-            if(!in_array($campoNombre, static::$atributes)) {
+            if(!in_array($campoNombre, static::$attributes)) {
                 unset($datos[$campoNombre]);
             }
             // Encryptamos la contraseña
@@ -320,7 +332,7 @@ class MainModel
         $campos = [];
         $holders = [];
         foreach ($datos as $campoNombre => $dato) {
-            if(in_array($campoNombre, static::$atributes)) {
+            if(in_array($campoNombre, static::$attributes)) {
 
                 $campos[] = $campoNombre;
                 $holders[] = ":" . $campoNombre;
@@ -347,7 +359,7 @@ class MainModel
         // Recorremos los datos.
         $values = [];
         foreach ($datos as $campoNombre => $dato) {
-            if(in_array($campoNombre, static::$atributes)) {
+            if(in_array($campoNombre, static::$attributes)) {
                 if($campoNombre === 'id') continue;
                 $values[] = "$campoNombre = :$campoNombre";
 
@@ -360,6 +372,32 @@ class MainModel
         $queryCond .= ":id";
         return $query . " " . $queryValues . " " . $queryCond;
     }
+
+
+	private static function deleteQuery()
+	{
+		$query = "DELETE FROM ". static::$table ." WHERE id=:id";
+		return $query;
+	}
+
+
+
+    public function uploadFiles($files)
+	{
+		foreach ($files as $file) {
+
+			// TODO Fix writing the tmp file
+
+			$target_file = App::getPublicPath(). '/images/' . static::$table . '/'  . $this->getPrimaryKey() . '/' . basename($file["name"]);
+
+
+			if (file_exists($file["tmp_name"]) && !file_exists($target_file)) {
+				return move_uploaded_file($file["tmp_name"], $target_file);
+			}
+		}
+
+		return null;
+	}
 
     /**
      * @return string

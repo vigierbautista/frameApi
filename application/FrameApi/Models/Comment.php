@@ -57,7 +57,7 @@ class Comment extends MainModel implements \JsonSerializable
      * Array con los campos permitidos para la tabla posts.
      * @var array
      */
-    protected static $atributes = [
+    protected static $attributes = [
         'comment',
         'date_added',
         'id_user',

@@ -38,7 +38,7 @@ class User extends MainModel implements \JsonSerializable
      * Array con los campos permitidos para la tabla users.
      * @var array
      */
-    protected static $atributes = [
+    protected static $attributes = [
         'id',
         'name',
         'last_name',

@@ -89,16 +89,18 @@ class MainController
 		View::renderJson($output);
     }
 
-    /**
-     * Guarda una Instancia del modelo en la base y lo devuelve.
-     * @param Request $request
-     */
+	/**
+	 * Guarda una Instancia del modelo en la base y lo devuelve.
+	 * @param Request $request
+	 * @throws \FrameApi\Exceptions\UndefinedValidationMethodException
+	 */
     public function save(Request $request)
     {
         // TODO Hacer upload de archivos.
 
         // Buscamos los datos en el request
         $data = $request->getData();
+        $files = $request->getFiles();
         $token = $request->getHeaders()['X-Token'];
 
         if(Token::verifyToken($token)) {
@@ -111,11 +113,29 @@ class MainController
 				try {
 					$newOne = $model::create($data);
 
-					$output = [
-						'status' => 1,
-						'data' => $newOne,
-						'msg' => 'Publicación realizada exitosamente.'
-					];
+					if ($files) {
+						$result = $newOne->uploadFiles($files);
+						if (!$result) {
+							$model::delete($newOne->getPrimaryKey());
+							$output = [
+								'status' => 0,
+								'msg' => 'Error al guardar la imágen.'
+							];
+						} else {
+							$output = [
+								'status' => 1,
+								'data' => $newOne,
+								'msg' => 'Publicación realizada exitosamente.'
+							];
+						}
+
+					} else {
+						$output = [
+							'status' => 1,
+							'data' => $newOne,
+							'msg' => 'Publicación realizada exitosamente.'
+						];
+					}
 
 				} catch (DBInsertException $e) {
 					$output = [
