@@ -86,6 +86,7 @@ class Request
 
             default:
                 $this->loadPostData();
+				$this->loadFiles();
                 break;
         }
     }

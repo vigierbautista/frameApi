@@ -96,7 +96,6 @@ class MainController
 	 */
     public function save(Request $request)
     {
-        // TODO Hacer upload de archivos.
 
         // Buscamos los datos en el request
         $data = $request->getData();
@@ -106,7 +105,7 @@ class MainController
 
 
         if (isset($files['image']['name'])) {
-			$data['image'] = $files['image']['name'] . '.png';
+			$data['image'] = $files['image']['name'];
 		} else {
 			$data['image'] = '';
 		}
@@ -178,12 +177,20 @@ class MainController
 	/**
 	 * Edita un registro de la base de datos
 	 * @param Request $request
+	 * @throws \FrameApi\Exceptions\UndefinedValidationMethodException
 	 */
     public function edit(Request $request)
     {
         // Buscamos los datos en el request
         $data = $request->getData();
         $token = $request->getHeaders()['X-Token'];
+		$files = $request->getFiles();
+
+		if (isset($files['image']['name'])) {
+			$data['image'] = $files['image']['name'];
+		} else {
+			$data['image'] = '';
+		}
 
         if(Token::verifyToken($token)) {
 			$model = $this->model;
@@ -194,10 +201,23 @@ class MainController
 
 				$edited = $model::edit($data);
 
+				if ($files) {
+
+					$edited->uploadFiles($files);
+
+					$output = [
+						'status' => 1,
+						'data' => $edited,
+						'msg' => 'Actualizamos tu información!'
+					];
+
+
+				}
+
 				$output = [
 					'status' => 1,
 					'data' => $edited,
-					'msg' => 'Edición realizada exitosamente.'
+					'msg' => 'Actualizamos tu información!'
 				];
 			} else {
 				$output = [

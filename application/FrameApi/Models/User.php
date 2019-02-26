@@ -33,6 +33,8 @@ class User extends MainModel implements \JsonSerializable
     /** @var string Password del usuario */
     protected $password;
 
+    protected $image;
+
 
     /**
      * Array con los campos permitidos para la tabla users.
@@ -43,7 +45,8 @@ class User extends MainModel implements \JsonSerializable
         'name',
         'last_name',
         'email',
-        'password'
+        'password',
+		'image'
     ];
 
     /**
@@ -175,6 +178,21 @@ class User extends MainModel implements \JsonSerializable
         $this->password = $password;
     }
 
+	/**
+	 * @return mixed
+	 */
+	public function getImage()
+	{
+		return $this->image;
+	}
+
+	/**
+	 * @param mixed $image
+	 */
+	public function setImage($image)
+	{
+		$this->image = $image;
+	}
 
 
     /**
@@ -191,7 +209,8 @@ class User extends MainModel implements \JsonSerializable
             'name'=> $this->getName(),
             'last_name'=> $this->getLastName(),
             'email'=> $this->getEmail(),
-            'password'=> $this->getPassword()
+            'password'=> $this->getPassword(),
+            'image'=> $this->getImage()
         ];
     }
 }

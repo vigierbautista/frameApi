@@ -34,7 +34,7 @@ Route::setRoute('PUT', '/categories/edit', 'CategoriesController@edit');
 Route::setRoute('GET', '/users', 'UsersController@index');
 Route::setRoute('GET', '/users/{id}', 'UsersController@get');
 Route::setRoute('POST', '/users/save', 'UsersController@save');
-Route::setRoute('PUT', '/users/edit', 'UsersController@edit');
+Route::setRoute('POST', '/users/edit', 'UsersController@edit');
 Route::setRoute('DELETE', '/users/delete', 'UsersController@delete');
 
 /**

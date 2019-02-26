@@ -263,16 +263,20 @@ class MainModel
 	 */
     public static function edit($data)
     {
+    	if (isset($data['image'])) {
+    		if (empty($data['image'])) {
+    			unset($data['image']);
+			}
+		}
 
         $data = static::filterData($data);
 
         $query = static::editQuery($data);
+
         $stmt = Connection::getStatement($query);
         if($stmt->execute($data)) {
             // Si el insert se hace con éxito creamos una instancia del modelo.
-            $model = new static;
-
-            $model->cargarDatos($data);
+            $model = new static($data['id']);
             return $model;
         } else {
             throw new DBUpdateException('Error al editar el registro.');
