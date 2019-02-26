@@ -21,11 +21,7 @@ const _DBNAME_ 		= __ENV__ == 'DEV' ?  'frame' 		: 'id8834651_frame';
 
 
 
-
-
-
-
-const __SITE_URL__ = 'http://localhost/frameApi/public_html';
+const __SITE_URL__ 	= __ENV__ == 'DEV' ? 'http://localhost/frameApi/public_html' : 'https://web-frame-app.000webhostapp.com/';
 
 
 /**
