@@ -15,13 +15,13 @@ if (in_array($_SERVER['SERVER_ADDR'], __LOCAL_ADDR__)) {
  * Constantes de conexión a la Base de Datos.
  */
 const _DBSERVER_ 	= __ENV__ == 'DEV' ? 'localhost' 	: 'localhost';
-const _DBUSER_ 		= __ENV__ == 'DEV' ? 'root' 		: 'id8834651_root';
-const _DBPASS_ 		= __ENV__ == 'DEV' ?  '' 			: 'frame';
-const _DBNAME_ 		= __ENV__ == 'DEV' ?  'frame' 		: 'id8834651_frame';
+const _DBUSER_ 		= __ENV__ == 'DEV' ? 'root' 		: 'u388058213_root';
+const _DBPASS_ 		= __ENV__ == 'DEV' ?  '' 			: 'dbframe';
+const _DBNAME_ 		= __ENV__ == 'DEV' ?  'frame' 		: 'u388058213_frame';
 
 
 
-const __SITE_URL__ 	= __ENV__ == 'DEV' ? 'http://localhost/frameApi/public_html' : 'https://web-frame-app.000webhostapp.com/';
+const __SITE_URL__ 	= __ENV__ == 'DEV' ? 'http://localhost/frameApi/public_html' : 'https://web-frame.site/';
 
 
 /**

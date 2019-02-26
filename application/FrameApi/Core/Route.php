@@ -23,7 +23,8 @@ class Route
         'GET' => [],
         'POST' => [],
         'PUT' => [],
-        'DELETE' => []
+        'DELETE' => [],
+		'OPTIONS' => []
     ];
 
     /**

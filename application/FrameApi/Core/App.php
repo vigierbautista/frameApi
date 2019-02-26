@@ -10,6 +10,7 @@ namespace FrameApi\Core;
 
 
 use FrameApi\Exceptions\BadRequestException;
+use FrameApi\View\View;
 
 /**
  * Class App
@@ -55,6 +56,8 @@ class App
         // Obtenemos la petición.
         $this->request = new Request();
 
+        if ($this->request->getMethod() == 'OPTIONS') return;
+
         // Verificamos si la ruta existe.
         // Pasamos el verbo de la y la ruta de la petición.
         if(Route::exists($this->request->getMethod(), $this->request->getUrl())) {
@@ -63,7 +66,7 @@ class App
             $this->executeController($controller);
 
         } else {
-            throw new BadRequestException("No existe la ruta especificada: " . $this->request->getUrl());
+            throw new BadRequestException("No existe la ruta especificada: " . $this->request->getUrl() . " para el metodo " . $this->request->getMethod());
         }
     }
 
