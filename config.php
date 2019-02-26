@@ -1,12 +1,28 @@
 <?php
 
+const __LOCAL_ADDR__ = [
+	'localhost',
+	'127.0.0.1',
+	'::1'
+];
+
+
+if (in_array($_SERVER['SERVER_ADDR'], __LOCAL_ADDR__)) {
+	define('__ENV__', 'DEV');
+}
+
 /**
  * Constantes de conexión a la Base de Datos.
  */
-const _DBSERVER_ = 'localhost';
-const _DBUSER_ = 'root';
-const _DBPASS_ = '';
-const _DBNAME_ = 'frame';
+const _DBSERVER_ 	= __ENV__ == 'DEV' ? 'localhost' 	: 'localhost';
+const _DBUSER_ 		= __ENV__ == 'DEV' ? 'root' 		: 'id8834651_root';
+const _DBPASS_ 		= __ENV__ == 'DEV' ?  '' 			: 'frame';
+const _DBNAME_ 		= __ENV__ == 'DEV' ?  'frame' 		: 'id8834651_frame';
+
+
+
+
+
 
 
 const __SITE_URL__ = 'http://localhost/frameApi/public_html';
