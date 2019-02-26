@@ -120,9 +120,12 @@ class MainModel
 
             if(in_array($key, static::$attributes)) {
 
-                $this->{$key} = $value;
+                if ($key == 'image' && $value !== '') {
+					$this->image = __SITE_URL__ . '/images/' . static::$table . '/' . $this->getPrimaryKey() . "/$value";
+				} else {
+					$this->{$key} = $value;
+				}
             }
-
 
             // Obtenemos el nombre de la clase.
             $className = get_class($this);
@@ -233,13 +236,11 @@ class MainModel
 	 */
     public static function create($data)
     {
-
         $data = static::filterData($data);
 
         $query = static::createQuery($data);
 
         $stmt = Connection::getStatement($query);
-
 
         if($stmt->execute($data)) {
             // Si el insert se hace con éxito creamos una instancia del modelo.
@@ -304,12 +305,8 @@ class MainModel
                 $datos['password'] = Hash::encrypt($dato);
             }
             // Seteamos el valor de la fecha a ahora.
-            if($campoNombre === 'date_added' && $dato === null) {
-                $datos['date_added'] = date("Y-m-d H:i:s");
-            }
-            // Si el campo de la imagen está vació le cargamos un valor por defecto.
-            if($campoNombre === 'image' && $dato === null) {
-                $datos['image'] = 'default.jpg';
+            if($campoNombre === 'date_added' && $dato == 'null') {
+                $datos['date_added'] = date("Y-m-d H:i:s", time());
             }
 
         }
@@ -386,10 +383,20 @@ class MainModel
 	{
 		foreach ($files as $file) {
 
-			// TODO Fix writing the tmp file
 
-			$target_file = App::getPublicPath(). '/images/' . static::$table . '/'  . $this->getPrimaryKey() . '/' . basename($file["name"]);
+			$table_img_dir = App::getPublicPath() . '/images/' . static::$table . '/';
 
+			if (!file_exists($table_img_dir) && !is_dir($table_img_dir)) {
+				mkdir($table_img_dir);
+			}
+
+			$post_img_dir = $table_img_dir . $this->getPrimaryKey() . '/';
+
+			if (!file_exists($post_img_dir) && !is_dir($post_img_dir)) {
+				mkdir($post_img_dir);
+			}
+
+			$target_file = $post_img_dir . basename($file["name"]);
 
 			if (file_exists($file["tmp_name"]) && !file_exists($target_file)) {
 				return move_uploaded_file($file["tmp_name"], $target_file);
@@ -398,6 +405,7 @@ class MainModel
 
 		return null;
 	}
+
 
     /**
      * @return string

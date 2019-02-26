@@ -101,6 +101,16 @@ class MainController
         // Buscamos los datos en el request
         $data = $request->getData();
         $files = $request->getFiles();
+
+        if ($data['date_added'] == 'null') $data['date_added'] = date("Y-m-d H:i", time());
+
+
+        if (isset($files['image']['name'])) {
+			$data['image'] = $files['image']['name'] . '.png';
+		} else {
+			$data['image'] = '';
+		}
+
         $token = $request->getHeaders()['X-Token'];
 
         if(Token::verifyToken($token)) {

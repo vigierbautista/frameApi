@@ -8,6 +8,10 @@ const _DBUSER_ = 'root';
 const _DBPASS_ = '';
 const _DBNAME_ = 'frame';
 
+
+const __SITE_URL__ = 'http://localhost/frameApi/public_html';
+
+
 /**
  * Error Display
  */

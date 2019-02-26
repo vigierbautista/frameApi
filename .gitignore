@@ -1,3 +1,6 @@
 # Add any directories, files, or patterns you don't want to be tracked by version control
 .idea/
 /.idea
+
+public_html/images
+!public_html/images/assets
