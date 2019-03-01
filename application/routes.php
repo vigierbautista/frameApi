@@ -17,6 +17,7 @@ Route::setRoute('GET', '/', 'HomeController@index');
 Route::setRoute('GET', '/posts', 'PostsController@index');
 Route::setRoute('GET', '/posts/{id}', 'PostsController@get');
 Route::setRoute('POST', '/posts/save', 'PostsController@save');
+Route::setRoute('POST', '/posts/like', 'PostsController@like');
 Route::setRoute('PUT', '/posts/edit', 'PostsController@edit');
 Route::setRoute('DELETE', '/posts/delete', 'PostsController@delete');
 

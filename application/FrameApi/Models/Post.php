@@ -7,8 +7,11 @@
  */
 
 namespace FrameApi\Models;
+use FrameApi\DB\Connection;
 use FrameApi\Exceptions\DBGetException;
+use FrameApi\Exceptions\DBInsertException;
 use FrameApi\View\View;
+use PDO;
 
 
 /**
@@ -55,6 +58,12 @@ class Post extends MainModel implements \JsonSerializable
 	 * @var User
 	 */
     protected $category;
+
+	/**
+	 * Likes del post por usario
+	 * @var
+	 */
+    protected $likes = [];
 
     /**
      * Array con los campos permitidos para la tabla posts.
@@ -103,6 +112,8 @@ class Post extends MainModel implements \JsonSerializable
 
 			parent::__construct($pk);
 
+			$this->setLikes();
+
 		} catch (DBGetException $e) {
 			View::renderJson([
 				'status' => 0,
@@ -111,6 +122,69 @@ class Post extends MainModel implements \JsonSerializable
 		}
 	}
 
+	public static function getAll()
+	{
+
+		$query = "SELECT * FROM posts ORDER BY date_added DESC";
+
+		$stmt = Connection::getStatement($query);
+
+		$stmt->execute();
+		$salida = [];
+		while($fila = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+			// Creamos un modelo.
+			$post = new Post();
+			// Le insertamos el id
+			$post->setPrimaryKey($fila[static::$primaryKey]);
+			// Le cargamos los datos.
+			$post->cargarDatos($fila);
+			$post->setLikes();
+			// Lo sumamos al array de salida.
+			$salida[] = $post;
+		}
+		return $salida;
+	}
+
+	public static function likePost($post_id, $user_id)
+	{
+		$query = "INSERT INTO liked_posts (id_user, id_post) VALUES (:id_user, :id_post)";
+		$stmt = Connection::getStatement($query);
+
+		return $stmt->execute([ ':id_user' => $user_id, ':id_post' => $post_id ]);
+	}
+
+
+	public static function unLikePost($post_id, $user_id)
+	{
+		$query = "DELETE FROM liked_posts WHERE id_user = :id_user AND id_post = :id_post";
+		$stmt = Connection::getStatement($query);
+
+		return $stmt->execute([ ':id_user' => $user_id, ':id_post' => $post_id ]);
+	}
+
+
+	private function setLikes()
+	{
+		$query = "
+			SELECT l.*, u.name, u.last_name, u.image 
+			FROM liked_posts l
+			LEFT JOIN  users u ON u.id = l.id_user
+			WHERE l.id_post = ". $this->getPrimaryKey();
+
+		$stmt = Connection::getStatement($query);
+
+		$stmt->execute();
+		while($fila = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+			$this->likes[] = $fila;
+
+		}
+	}
+
+	public function getLikes() {
+		return $this->likes;
+	}
 
 
     /**
@@ -125,10 +199,10 @@ class Post extends MainModel implements \JsonSerializable
             'image'=> $this->getImage(),
             'content'=> $this->getContent(),
             'date_added'=> $this->getDateAdded(),
-            'id_user'=> $this->getIdUser(),
-            'user'=> $this->user->getName(),
+            'user'=> $this->user->getPublicData(),
 			'id_category' => $this->category->getId(),
 			'category' => $this->category->getName(),
+			'likes' => $this->getLikes()
         ];
     }
 

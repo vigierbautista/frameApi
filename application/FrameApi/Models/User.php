@@ -213,4 +213,14 @@ class User extends MainModel implements \JsonSerializable
             'image'=> $this->getImage()
         ];
     }
+
+	public function getPublicData()
+	{
+		return [
+			'id'=> $this->getId(),
+			'name'=> $this->getName(),
+			'last_name'=> $this->getLastName(),
+			'image'=> $this->getImage()
+		];
+	}
 }

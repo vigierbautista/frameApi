@@ -101,7 +101,9 @@ class MainController
         $data = $request->getData();
         $files = $request->getFiles();
 
-        if ($data['date_added'] == 'null') $data['date_added'] = date("Y-m-d H:i:s", time());
+        if ($data['date_added'] == 'null' || $data['date_added'] == null || empty($data['date_added'])) {
+        	$data['date_added'] = date("Y-m-d H:i:s", time());
+		}
 
 
         if (isset($files['image']['name'])) {

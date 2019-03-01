@@ -32,6 +32,7 @@ class View
         }
         // Requerimos la vista.
         require App::getViewsPath() . '/' . $view . ".php";
+        die;
     }
 
     /**
@@ -42,5 +43,6 @@ class View
     {
         header('Content-Type: application/json');
         echo json_encode($data);
+        die;
     }
 }

@@ -111,7 +111,9 @@ class Comment extends MainModel implements \JsonSerializable
     {
         $query = "SELECT *
                   FROM comments
-                  WHERE id_post=$postId";
+                  WHERE id_post=$postId
+                  ORDER BY date_added DESC
+		";
 
         $stmt = Connection::getStatement($query);
 
@@ -144,7 +146,7 @@ class Comment extends MainModel implements \JsonSerializable
             'date_added'=> $this->getDateAdded(),
             'id_user'=> $this->getIdUser(),
             'id_post'=> $this->getIdPost(),
-            'user'=> $this->user->getName(),
+            'user'=> $this->user->getPublicData(),
             'post'=> $this->post->getTitle(),
         ];
     }
