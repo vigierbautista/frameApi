@@ -120,8 +120,13 @@ class MainModel
 
             if(in_array($key, static::$attributes)) {
 
-                if ($key == 'image' && $value !== '') {
-					$this->image = __SITE_URL__ . '/images/' . static::$table . '/' . $this->getPrimaryKey() . "/$value";
+                if ($key == 'image') {
+                	if ($value === '' || !$value || empty($value) || $value === null || $value === '(NULL)') {
+
+						$this->image = '';
+					} else {
+						$this->image = __SITE_URL__ . '/images/' . static::$table . '/' . $this->getPrimaryKey() . "/$value";
+					}
 				} else {
 					$this->{$key} = $value;
 				}
