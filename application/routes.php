@@ -18,7 +18,7 @@ Route::setRoute('GET', '/posts', 'PostsController@index');
 Route::setRoute('GET', '/posts/{id}', 'PostsController@get');
 Route::setRoute('POST', '/posts/save', 'PostsController@save');
 Route::setRoute('POST', '/posts/like', 'PostsController@like');
-Route::setRoute('PUT', '/posts/edit', 'PostsController@edit');
+Route::setRoute('POST', '/posts/edit', 'PostsController@edit');
 Route::setRoute('DELETE', '/posts/delete', 'PostsController@delete');
 
 /**
@@ -27,7 +27,7 @@ Route::setRoute('DELETE', '/posts/delete', 'PostsController@delete');
 Route::setRoute('GET', '/categories', 'CategoriesController@index');
 Route::setRoute('GET', '/categories/{id}', 'CategoriesController@get');
 Route::setRoute('POST', '/categories/save', 'CategoriesController@save');
-Route::setRoute('PUT', '/categories/edit', 'CategoriesController@edit');
+Route::setRoute('POST', '/categories/edit', 'CategoriesController@edit');
 
 /**
  * Rutas de Users.
@@ -37,6 +37,9 @@ Route::setRoute('GET', '/users/{id}', 'UsersController@get');
 Route::setRoute('POST', '/users/save', 'UsersController@save');
 Route::setRoute('POST', '/users/edit', 'UsersController@edit');
 Route::setRoute('DELETE', '/users/delete', 'UsersController@delete');
+Route::setRoute('POST', '/users/send-recover-code', 'UsersController@sendRecoverCode');
+Route::setRoute('POST', '/users/validate-recover-code', 'UsersController@validateRecoverCode');
+Route::setRoute('POST', '/users/change-pass', 'UsersController@changePass');
 
 /**
  * Rutas de Login

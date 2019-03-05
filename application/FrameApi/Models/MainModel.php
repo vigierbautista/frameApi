@@ -377,7 +377,7 @@ class MainModel
 
 	private static function deleteQuery()
 	{
-		$query = "DELETE FROM ". static::$table ." WHERE id=:id";
+		$query = "DELETE FROM ". static::$table ." WHERE " . static::$primaryKey . "=:" . static::$primaryKey;
 		return $query;
 	}
 

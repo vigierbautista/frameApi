@@ -34,17 +34,20 @@ class AuthController
 
 
 		$Validator = new Validator($data, [
-			'name' => ['required'],
+			'email' => ['required', 'email'],
 			'password' => ['required'],
 		], [
-			'name' => ['required' => 'Ingrese su nombre'],
+			'email' => [
+				'required' => 'Ingrese su email',
+				'email' => 'El formato del email debe ser ejemplo@dominio.com'
+			],
 			'password' => ['required' => 'Ingrese su contraseña'],
 		]);
 
 		if ($Validator->isValid()) {
 			try {
 
-				$output = Authenticate::login($data['name'], $data['password']);
+				$output = Authenticate::login($data['email'], $data['password']);
 
 			} catch (InvalidLoginException $e) {
 				$output = [

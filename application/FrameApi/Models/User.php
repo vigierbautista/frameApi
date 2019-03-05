@@ -57,7 +57,7 @@ class User extends MainModel implements \JsonSerializable
 
 
 	protected static $validation_rules = [
-		'name' => ['required', 'min:3', 'max:20'],
+		'email' => ['required', 'min:3', 'max:20'],
 		'last_name' => ['required', 'min:3', 'max:20']
 	];
 
@@ -75,17 +75,18 @@ class User extends MainModel implements \JsonSerializable
 		]
 	];
 
-    /**
-     * Busca a un usuario por su mail.
-     * @param string $userName
-     * @return bool
-     */
-    public function getByName($userName)
+
+	/**
+	 * Busca a un usuario por su mail.
+	 * @param $email
+	 * @return bool
+	 */
+    public function getByEmail($email)
     {
         $query = "SELECT * FROM users
-                  WHERE name = ?";
+                  WHERE email = '$email'";
         $stmt = Connection::getStatement($query);
-        $stmt->execute([$userName]);
+        $stmt->execute();
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
         if($userData) {
             $this->cargarDatos($userData);
@@ -95,7 +96,15 @@ class User extends MainModel implements \JsonSerializable
         }
     }
 
+	public static function changePass($id, $password)
+	{
+		$query = "
+			UPDATE users SET `password`= :password WHERE  `id`=:id;
+		";
+		$stmt = Connection::getStatement($query);
 
+		return $stmt->execute(['id' => $id, 'password' => $password]);
+	}
 
 
     /**

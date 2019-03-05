@@ -21,7 +21,7 @@ const _DBNAME_ 		= __ENV__ == 'DEV' ?  'frame' 		: 'u388058213_frame';
 
 
 
-const __SITE_URL__ 	= __ENV__ == 'DEV' ? 'http://localhost/frameApi/public_html' : 'https://web-frame.site/';
+const __SITE_URL__ 	= __ENV__ == 'DEV' ? 'http://localhost/frameApi/public_html' : 'https://web-frame.site';
 
 
 /**
@@ -33,7 +33,7 @@ ini_set('html_errors', false);
 error_reporting(E_ALL);
 
 # CORS
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, X-Token, process-data, transformrequest, Authorization');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
 header('Access-Control-Allow-Origin: *');
 

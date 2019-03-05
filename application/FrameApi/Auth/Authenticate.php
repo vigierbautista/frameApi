@@ -22,19 +22,19 @@ class Authenticate
 
 	/**
 	 * Loguea un usuario
-	 * @param $userName
+	 * @param $email
 	 * @param $pass
 	 * @param bool $apiResponse | optional: indica si la respuesta debe tratarse como Api
 	 * @return array
 	 * @throws InvalidLoginException
 	 * @throws \FrameApi\Exceptions\DBGetException
 	 */
-    public static function login($userName, $pass, $apiResponse = true)
+    public static function login($email, $pass, $apiResponse = true)
     {
         $user = new User;
 
         // Verifico si existe el User
-        if($result = $user->getByName($userName)) {
+        if($result = $user->getByEmail($email)) {
 
             // Verifico si el password es correcto.
             if(Hash::verify($pass, $user->getPassword())) {
